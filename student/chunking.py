@@ -38,6 +38,8 @@ def chunking(
                     aster = ast.parse(text)
                     for node in ast.walk(aster):
                         if isinstance(node, (ast.ClassDef)):
+                            if isinstance(node.end_lineno, int):
+                                node.end_lineno -= 1
                             node_text = "\n".join(
                                 lines[node.lineno - 1:node.end_lineno]
                             )
@@ -50,6 +52,8 @@ def chunking(
                                 chunks.append(new_chunk)
                                 corpus.append(new_corp)
                             if node.end_lineno:
+                                if isinstance(node.end_lineno, int):
+                                    node.end_lineno += 1
                                 covered.update(
                                     range(node.lineno - 1, node.end_lineno)
                                 )
@@ -60,6 +64,8 @@ def chunking(
                             )
                             and lines[node.lineno] != "#"
                         ):
+                            if isinstance(node.end_lineno, int):
+                                node.end_lineno -= 1
                             node_text = "\n".join(
                                 lines[node.lineno - 1:node.end_lineno]
                             )
@@ -71,6 +77,8 @@ def chunking(
                                 )
                                 chunks.append(new_chunk)
                                 corpus.append(new_corp)
+                            if isinstance(node.end_lineno, int):
+                                node.end_lineno += 1
                             if node.end_lineno:
                                 covered.update(
                                     range(node.lineno - 1, node.end_lineno)
@@ -83,9 +91,10 @@ def chunking(
                     ]
                     if lines_left:
                         part = str()
-                        for li in lines_left:
+                        for li in lines:
                             if li != "#":
                                 part += li
+                                part += '\n'
                             elif part and li == "#":
                                 tmp = chunk(part, size, len, overlap=overlap)
                                 balise = 0
@@ -95,7 +104,7 @@ def chunking(
                                     )
                                     chunks.append(new_chunk)
                                     corpus.append(new_corp)
-                                part = ""
+                                part = str()
                         if part:
                             tmp = chunk(part, size, len, overlap=overlap)
                             balise = 0
@@ -111,7 +120,9 @@ def chunking(
 def create_obj(
     filepath: str, src: str, text: Any, balise: int
 ) -> tuple[MinimalSource, dict[str, Any], int]:
-    start = src.find(text, balise)
+    if not src.endswith('\n'):
+        src += '\n'
+    start = src.find(text)
     end = start + len(text)
     chunk = MinimalSource(
         file_path=filepath,

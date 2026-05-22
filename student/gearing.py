@@ -40,7 +40,7 @@ def searcher_ds(unanswered: RagDataset, k: int) -> StudentSearchResults:
     return StudentSearchResults(search_results=answered, k=k)
 
 
-def answerer(sources: dict[str, Any], query: str) -> Any:
+def answerer(sources: list[dict[str, Any]], query: str) -> Any:
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     model = AutoModelForCausalLM.from_pretrained(

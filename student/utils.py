@@ -61,6 +61,7 @@ def search_ds(
 
     with open(save_directory, "w") as f:
         json.dump(unanswered.model_dump(mode="json"), f, indent=4)
+    print(f"Saved student_search_results to {save_directory}")
 
 
 def answer(query: str, k: int = 5) -> None:
