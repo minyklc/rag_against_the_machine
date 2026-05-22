@@ -11,7 +11,7 @@ MODEL_NAME = "Qwen/Qwen3-0.6B"
 
 
 def index(max_chunk_size: int = 2000) -> None:
-    corpus, chunks = chunking(max_chunk_size, int(max_chunk_size / 5))
+    corpus, chunks = chunking(max_chunk_size, int(max_chunk_size / 6))
 
     corpus_tokens = bm25s.tokenize([c["text"] for c in corpus], stopwords="en")
     bmodel = bm25s.BM25(corpus=corpus)
