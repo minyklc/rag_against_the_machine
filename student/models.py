@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 import uuid
 from typing import List
 
@@ -29,6 +29,10 @@ class MinimalSearchResults(BaseModel):
     question_id: str
     question: str
     retrieved_sources: List[MinimalSource]
+
+    @computed_field
+    def question_str(self) -> str:
+        return self.question
 
 
 class MinimalAnswer(MinimalSearchResults):
