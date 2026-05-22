@@ -1,11 +1,13 @@
 from .chunking import chunking
-import bm25s # type: ignore
+import bm25s
 import os
 import json
-from llm_sdk import Small_LLM_Model
-import numpy as np
-from typing import Any
-from tqdm import tqdm
+from .models import UnansweredQuestion, AnsweredQuestion
+from .models import RagDataset, MinimalSource
+from .gearing import searcher, searcher_ds, answerer, answerer_ds
+
+
+MODEL_NAME = "Qwen/Qwen3-0.6B"
 
 
 def index(max_chunk_size: int = 2000) -> None:
@@ -17,55 +19,93 @@ def index(max_chunk_size: int = 2000) -> None:
 
     bmodel.save("data/processed/bm25_index")
     os.makedirs("data/processed/chunks", exist_ok=True)
-    with open("data/processed/chunks/all_chunks.json", 'w') as f:
+    with open("data/processed/chunks/all_chunks.json", "w") as f:
         json.dump([c.model_dump() for c in chunks], f, indent=4)
     print("Ingestion complete! Indices saved under data/processed/")
 
 
-def search(query: str, k: int = 5, answer=False) -> None | list[dict[str, Any]]:
-    bmodel = bm25s.BM25.load("data/processed/bm25_index", load_corpus=True)
-
-    print(query)
-    query_tokens = bm25s.tokenize(query)
-
-    results, scores = bmodel.retrieve(query_tokens, k=k)
-
-    for i in range(results.shape[1]):
-        doc, score = results[0, i], scores[0, i]
-        if not answer:
-            print(f"Rank {i+1} (score: {score:.2f}): {doc['filepath']} ({doc['first']} - {doc['last']})\n")
-    if answer:
-        return [results[0, i] for i in range(k)]
+def search(query: str, k: int = 5) -> None:
+    r, s = searcher(query, k)
+    for i in range(k):
+        print(
+            f"Rank {i + 1} (score: {s[i]:.2f}): \
+            {r[i]['filepath']} ({r[i]['first']} - {r[i]['last']})\n"
+        )
 
 
-def search_db():
-    ...
+def search_ds(
+    dataset_path: str = "data/datasets/UnansweredQuestions\
+/dataset_docs_public.json",
+    k: int = 5,
+    save_directory: str = "data/output/search_results",
+) -> None:
+
+    filename = dataset_path.split("/")[-1]
+    with open(dataset_path, "r") as f:
+        unanswered_data = json.load(f)["rag_questions"]
+
+    rag_ds = RagDataset(
+        rag_questions=[
+            UnansweredQuestion(
+                question_id=u["question_id"], question=u["question"]
+            )
+            for u in unanswered_data
+        ]
+    )
+    unanswered = searcher_ds(rag_ds, k)
+
+    os.makedirs(save_directory, exist_ok=True)
+    if not save_directory.endswith("/"):
+        save_directory += "/"
+    save_directory += filename
+
+    with open(save_directory, "w") as f:
+        json.dump(unanswered.model_dump(mode="json"), f, indent=4)
 
 
 def answer(query: str, k: int = 5) -> None:
-    sources = search(query, k, True)
-    sources_text = str()
-    if sources:
-        for s in sources:
-            sources_text += s["text"]
-            if s != sources[-1]:
-                sources_text += '\n'
-    # print(sources_text)
-    if not sources:
-        return
+    sources, _ = searcher(query, k)
+    answer = answerer(sources, query)
+    print(answer)
 
-    llm = Small_LLM_Model(device="cpu")
-    tokens = llm.encode(f"""Sources: {sources_text}
-        Query: {query}
-        Answer:"""
-    ).cpu().detach().numpy()[0].tolist()
 
-    res = str()
-    for _ in tqdm(range(35), "generating..."):
-        logits = llm.get_logits_from_input_ids(tokens)
-        token_id = int(np.argmax(logits))
-        if '\n' in llm.decode(token_id):
-            break
-        tokens.append(token_id)
-        res += llm.decode(token_id)
-    print(res)
+def answer_ds(
+    student_search_results_path: str = "data/output/search_results\
+/dataset_docs_public.json",
+    save_directory: str = "data/output/search_results_and_answer",
+) -> None:
+
+    filename = student_search_results_path.split("/")[-1]
+    with open(student_search_results_path, "r") as f:
+        data = json.load(f)
+        answered_data = data["search_results"]
+        k = data["k"]
+
+    rag_ds = RagDataset(
+        rag_questions=[
+            AnsweredQuestion(
+                question_id=a["question_id"],
+                question=a["question"],
+                sources=[
+                    MinimalSource(
+                        file_path=s["file_path"],
+                        first_character_index=s["first_character_index"],
+                        last_character_index=s["last_character_index"],
+                        text=s["text"],
+                    )
+                    for s in a["retrieved_sources"]
+                ],
+                answer="",
+            )
+            for a in answered_data
+        ]
+    )
+
+    answered = answerer_ds(rag_ds, k)
+    os.makedirs(save_directory, exist_ok=True)
+    if not save_directory.endswith("/"):
+        save_directory += "/"
+    save_directory += filename
+
+    with open(save_directory, "w") as f:
+        json.dump(answered.model_dump(mode="json"), f, indent=4)
