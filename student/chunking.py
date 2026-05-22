@@ -104,7 +104,7 @@ def chunking(
                                     )
                                     chunks.append(new_chunk)
                                     corpus.append(new_corp)
-                                part = str()
+                                part = ""
                         if part:
                             tmp = chunk(part, size, len, overlap=overlap)
                             balise = 0
