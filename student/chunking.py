@@ -16,6 +16,8 @@ def chunking(
     for thing in tqdm(
         glob("data/raw/vllm-0.10.1/**", recursive=True), "chunking..."
     ):
+        """process all files from data/raw/vllm-0.10.1
+        through multiple chunking style"""
         # print(thing)
         if os.path.isfile(thing):
             if thing.endswith(".md") or thing.endswith(".txt"):
@@ -120,6 +122,8 @@ def chunking(
 def create_obj(
     filepath: str, src: str, text: Any, balise: int
 ) -> tuple[MinimalSource, dict[str, Any], int]:
+    """helper function for chunking(), return MinimalSource object
+    and a dict containing data and metadata"""
     if not src.endswith('\n'):
         src += '\n'
     start = src.find(text)

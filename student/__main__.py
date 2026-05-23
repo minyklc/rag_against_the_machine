@@ -4,6 +4,7 @@ import fire
 
 
 def main() -> None:
+    """main program runned through Fire module"""
     fire.Fire(
         {
             "index": index,

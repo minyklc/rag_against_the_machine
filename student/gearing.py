@@ -10,6 +10,8 @@ MODEL_NAME = "Qwen/Qwen3-0.6B"
 
 
 def searcher(query: str, k: int = 5) -> tuple[list[dict[str, Any]], list[Any]]:
+    """helper function for search(), return the result of
+    retrievial search and their scores"""
     bmodel = bm25s.BM25.load("data/processed/bm25_index", load_corpus=True)
 
     query_tokens = bm25s.tokenize(query)
@@ -19,6 +21,7 @@ def searcher(query: str, k: int = 5) -> tuple[list[dict[str, Any]], list[Any]]:
 
 
 def searcher_ds(unanswered: RagDataset, k: int) -> StudentSearchResults:
+    """helper function for search_ds(), return StudentSearchResults object"""
     answered = list()
     for q in tqdm(unanswered.rag_questions, "searching..."):
         tmp, _ = searcher(q.question, k)
@@ -40,7 +43,8 @@ def searcher_ds(unanswered: RagDataset, k: int) -> StudentSearchResults:
     return StudentSearchResults(search_results=answered, k=k)
 
 
-def answerer(sources: list[dict[str, Any]], query: str) -> Any:
+def answerer(sources: list[Any], query: str) -> Any:
+    """helper function for answer(), return the answer of the AI model"""
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     model = AutoModelForCausalLM.from_pretrained(
@@ -81,6 +85,8 @@ def answerer(sources: list[dict[str, Any]], query: str) -> Any:
 
 def answerer_ds(answered: RagDataset, k: int
                 ) -> StudentSearchResultsAndAnswer:
+    """helper function for answer_ds(),
+    return StudentSearchResultsandAnswer object"""
     minimal_list = list()
     for a in tqdm(answered.rag_questions, "answering..."):
         if isinstance(a, AnsweredQuestion):

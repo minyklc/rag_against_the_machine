@@ -11,6 +11,7 @@ MODEL_NAME = "Qwen/Qwen3-0.6B"
 
 
 def index(max_chunk_size: int = 2000) -> None:
+    """index files from data/raw/vllm.0.10.1 in json and for bm25s model"""
     corpus, chunks = chunking(max_chunk_size, int(max_chunk_size / 6))
 
     corpus_tokens = bm25s.tokenize([c["text"] for c in corpus], stopwords="en")
@@ -25,6 +26,7 @@ def index(max_chunk_size: int = 2000) -> None:
 
 
 def search(query: str, k: int = 5) -> None:
+    """search for a single query with bm25s and print k sources"""
     r, s = searcher(query, k)
     for i in range(k):
         print(
@@ -39,6 +41,8 @@ def search_ds(
     k: int = 5,
     save_directory: str = "data/output/search_results",
 ) -> None:
+    """search for multiple querys with bm25s and
+    write k sources in json file"""
 
     filename = dataset_path.split("/")[-1]
     with open(dataset_path, "r") as f:
@@ -65,6 +69,7 @@ def search_ds(
 
 
 def answer(query: str, k: int = 5) -> None:
+    """generate the answer for a single query with Qwen3-0.6B and print it"""
     sources, _ = searcher(query, k)
     answer = answerer(sources, query)
     print(answer)
@@ -75,6 +80,8 @@ def answer_ds(
 /dataset_docs_public.json",
     save_directory: str = "data/output/search_results_and_answer",
 ) -> None:
+    """generate the answer for each query provided with Qwen3-0.6B and
+    write answers in json file"""
 
     filename = student_search_results_path.split("/")[-1]
     with open(student_search_results_path, "r") as f:
