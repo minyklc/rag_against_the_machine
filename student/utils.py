@@ -2,6 +2,7 @@ from .chunking import chunking
 import bm25s
 import os
 import json
+import subprocess
 from .models import UnansweredQuestion, AnsweredQuestion
 from .models import RagDataset, MinimalSource
 from .gearing import searcher, searcher_ds, answerer, answerer_ds
@@ -117,3 +118,12 @@ def answer_ds(
 
     with open(save_directory, "w") as f:
         json.dump(answered.model_dump(mode="json"), f, indent=4)
+
+def evaluate():
+    path = os.getcwd()
+    print(path)
+    cmd = [path + "/moulinette_pkg/moulinette-ubuntu"]
+    args = "evaluate_student_search_results --student_answer_path data/output/search_results/dataset_docs_public.json --dataset_path data/datasets/AnsweredQuestions/dataset_docs_public.json --k 10 --max_context_length 2000".split()
+    for a in args:
+        cmd.append(a)
+    subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True)

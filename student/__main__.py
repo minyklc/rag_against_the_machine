@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from .utils import index, search, answer, search_ds, answer_ds
+from .utils import evaluate, index, search, answer, search_ds, answer_ds
 import fire
 
 
@@ -12,6 +12,7 @@ def main() -> None:
             "search_dataset": search_ds,
             "answer": answer,
             "answer_dataset": answer_ds,
+            "evaluate": evaluate
         }
     )
 
