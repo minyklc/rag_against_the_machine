@@ -124,20 +124,20 @@ def evaluate(mode: str = 'docs') -> None:
     if mode == 'docs':
         args = "evaluate_student_search_results --student_answer_path \
                 data/output/search_results/dataset_docs_public.json \
-                --dataset_path data/datasets/AnsweredQuestions/\
-                dataset_docs_public.json --k 10 --max_context_length \
-                2000".split()
+                --dataset_path \
+                data/datasets/AnsweredQuestions/dataset_docs_public.json \
+                --k 10 --max_context_length 2000".split()
     elif mode == 'code':
         args = "evaluate_student_search_results --student_answer_path \
                 data/output/search_results/dataset_code_public.json \
-                --dataset_path data/datasets/AnsweredQuestions/\
-                dataset_code_public.json --k 10 --max_context_length \
-                2000".split()
+                --dataset_path \
+                data/datasets/AnsweredQuestions/dataset_code_public.json \
+                --k 10 --max_context_length 2000".split()
     else:
-        print("uv run python -m student evaluate --mode <docs or code>")
+        print("error: --mode docs or --mode code")
         return
     path = os.getcwd()
     cmd = [path + "/moulinette_pkg/moulinette-ubuntu"]
     for a in args:
         cmd.append(a)
-    subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True)
+    subprocess.run(cmd)
