@@ -17,7 +17,7 @@ EXAM_ANSWER = ./exams_pkg/exams/scripts/exam_answer.sh
 EXAM_EDGE = ./exams_pkg/exams/scripts/exam_edge_cases.sh
 
 # Default single-query parameters (override: make answer Q="..." K=5)
-Q   ?= How is tensor parallelism configured?
+Q   ?= What API endpoint does vLLM support for chat completions?
 Q2  ?= How to configure OpenAI server?
 Q3  ?= How do I enable prefix caching?
 K   ?= 10
@@ -55,8 +55,8 @@ fclean: clean
 	rm -rf data/output
 
 lint:
-	$(UV) run flake8 src
-	$(UV) run mypy src --warn-return-any --warn-unused-ignores \
+	$(UV) run flake8
+	$(UV) run mypy . --warn-return-any --warn-unused-ignores \
 		--ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 # ── Single-query commands ───────────────────────────────────────────────

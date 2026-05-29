@@ -74,11 +74,11 @@ def answerer(sources: list[Any], query: str) -> Any:
     )
     model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
 
-    generated_ids = model.generate(
-        **model_inputs,  # type: ignore[misc]
+    generated_ids = model.generate(  # type: ignore[misc]
+        **model_inputs,
         max_new_tokens=32768,
     )
-    output_ids = generated_ids[0][len(model_inputs.input_ids[0]) :].tolist()
+    output_ids = generated_ids[0][len(model_inputs.input_ids[0]):].tolist()
 
     try:
         # rindex finding 151668 (</think>)

@@ -18,7 +18,7 @@ MODEL_NAME = "Qwen/Qwen3-0.6B"
 
 def index(max_chunk_size: int = 2000) -> None:
     """index files from data/raw/vllm.0.10.1 in json and for bm25s model"""
-    corpus, chunks = chunking(max_chunk_size, int(max_chunk_size / 6))
+    corpus, chunks = chunking(max_chunk_size, int(max_chunk_size / 8))
 
     corpus_tokens = bm25s.tokenize([c["text"] for c in corpus], stopwords="en")
     bmodel = bm25s.BM25(corpus=corpus)
