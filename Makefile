@@ -27,10 +27,10 @@ MAX_CHUNK_SIZE      ?= 2000
 MAX_CONTEXT_LENGTH  ?= 2000
 
 # ── Datasets ─────────────────────────────────────────────────────────────────
-UNANSWERED_DOCS = data/datasets/public/UnansweredQuestions/dataset_docs_public.json
-UNANSWERED_CODE = data/datasets/public/UnansweredQuestions/dataset_code_public.json
-ANSWERED_DOCS   = data/datasets/public/AnsweredQuestions/dataset_docs_public.json
-ANSWERED_CODE   = data/datasets/public/AnsweredQuestions/dataset_code_public.json
+UNANSWERED_DOCS = data/datasets/UnansweredQuestions/dataset_docs_public.json
+UNANSWERED_CODE = data/datasets/UnansweredQuestions/dataset_code_public.json
+ANSWERED_DOCS   = data/datasets/AnsweredQuestions/dataset_docs_public.json
+ANSWERED_CODE   = data/datasets/AnsweredQuestions/dataset_code_public.json
 
 SEARCH_OUT  = data/output/search_results
 ANSWER_OUT  = data/output/search_results_and_answer
