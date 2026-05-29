@@ -120,7 +120,7 @@ total 40\
 #### **Searching one dataset**
 
 `uv run python -m student search_dataset
---dataset_path data/datasets/public/UnansweredQuestions/dataset_docs_public.json
+--dataset_path data/datasets/UnansweredQuestions/dataset_docs_public.json
 --k 10
 --save_directory data/output/search_results`\
 Saved student_search_results to data/output/search_results/dataset_docs_public.json\

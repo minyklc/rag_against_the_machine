@@ -84,11 +84,20 @@ def chunking(
                                     range(node.lineno - 1, node.end_lineno)
                                 )
 
-                    lines_left = [
-                        line
-                        for i, line in enumerate(lines)
-                        if i not in covered
-                    ]
+                    # lines_left = [
+                    #     line
+                    #     for i, line in enumerate(lines)
+                    #     if i not in covered
+                    # ]
+                    lines_left = list()
+                    state = False
+                    for i, line in enumerate(lines):
+                        if i not in covered:
+                            state = True
+                            lines_left.append(line)
+                        elif i in covered and state:
+                            lines_left.append('#')
+                            state = False
                     if lines_left:
                         part = str()
                         for li in lines_left:
