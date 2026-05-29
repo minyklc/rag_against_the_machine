@@ -1,12 +1,17 @@
-from .chunking import chunking
-import bm25s
-import os
 import json
+import os
 import subprocess
-from .models import UnansweredQuestion, AnsweredQuestion
-from .models import RagDataset, MinimalSource
-from .gearing import searcher, searcher_ds, answerer, answerer_ds
 
+import bm25s
+
+from .chunking import chunking
+from .gearing import answerer, answerer_ds, searcher, searcher_ds
+from .models import (
+    AnsweredQuestion,
+    MinimalSource,
+    RagDataset,
+    UnansweredQuestion,
+)
 
 MODEL_NAME = "Qwen/Qwen3-0.6B"
 
@@ -37,7 +42,7 @@ def search(query: str, k: int = 5) -> None:
 
 
 def search_ds(
-    dataset_path: str = "data/datasets/UnansweredQuestions\
+    dataset_path: str = "data/datasets/public/UnansweredQuestions\
 /dataset_docs_public.json",
     k: int = 5,
     save_directory: str = "data/output/search_results",
@@ -120,14 +125,14 @@ def answer_ds(
         json.dump(answered.model_dump(mode="json"), f, indent=4)
 
 
-def evaluate(mode: str = 'docs') -> None:
-    if mode == 'docs':
+def evaluate(mode: str = "docs") -> None:
+    if mode == "docs":
         args = "evaluate_student_search_results --student_answer_path \
                 data/output/search_results/dataset_docs_public.json \
                 --dataset_path \
                 data/datasets/AnsweredQuestions/dataset_docs_public.json \
                 --k 10 --max_context_length 2000".split()
-    elif mode == 'code':
+    elif mode == "code":
         args = "evaluate_student_search_results --student_answer_path \
                 data/output/search_results/dataset_code_public.json \
                 --dataset_path \

@@ -18,7 +18,6 @@ def chunking(
     ):
         """process all files from data/raw/vllm-0.10.1
         through multiple chunking style"""
-        # print(thing)
         if os.path.isfile(thing):
             if thing.endswith(".md") or thing.endswith(".txt"):
                 with open(thing, "r") as f:

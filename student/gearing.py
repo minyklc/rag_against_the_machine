@@ -1,10 +1,18 @@
-import bm25s
-from .models import RagDataset, MinimalSource, MinimalAnswer
-from .models import MinimalSearchResults, StudentSearchResults
-from .models import AnsweredQuestion, StudentSearchResultsAndAnswer
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from tqdm import tqdm
 from typing import Any
+
+import bm25s
+from tqdm import tqdm
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+from .models import (
+    AnsweredQuestion,
+    MinimalAnswer,
+    MinimalSearchResults,
+    MinimalSource,
+    RagDataset,
+    StudentSearchResults,
+    StudentSearchResultsAndAnswer,
+)
 
 MODEL_NAME = "Qwen/Qwen3-0.6B"
 
@@ -51,6 +59,9 @@ def answerer(sources: list[Any], query: str) -> Any:
         MODEL_NAME, torch_dtype="auto", device_map="auto"
     )
 
+    if not query:
+        raise ValueError("query must be non empty")
+
     prompt = f"""Sources: {sources}
         Query: {query}
         Answer in one sentence:"""
@@ -63,9 +74,11 @@ def answerer(sources: list[Any], query: str) -> Any:
     )
     model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
 
-    generated_ids = model.generate(**model_inputs,  # type: ignore[misc]
-                                   max_new_tokens=32768)
-    output_ids = generated_ids[0][len(model_inputs.input_ids[0]):].tolist()
+    generated_ids = model.generate(
+        **model_inputs,  # type: ignore[misc]
+        max_new_tokens=32768,
+    )
+    output_ids = generated_ids[0][len(model_inputs.input_ids[0]) :].tolist()
 
     try:
         # rindex finding 151668 (</think>)
@@ -75,16 +88,13 @@ def answerer(sources: list[Any], query: str) -> Any:
 
     # thinking_content = tokenizer.decode(output_ids[:index],
     # skip_special_tokens=True).strip("\n")
-    content = tokenizer.decode(
-        output_ids[index:], skip_special_tokens=True
-    )
+    content = tokenizer.decode(output_ids[index:], skip_special_tokens=True)
     if isinstance(content, str):
-        content.strip('\n')
+        content.strip("\n")
     return content
 
 
-def answerer_ds(answered: RagDataset, k: int
-                ) -> StudentSearchResultsAndAnswer:
+def answerer_ds(answered: RagDataset, k: int) -> StudentSearchResultsAndAnswer:
     """helper function for answer_ds(),
     return StudentSearchResultsandAnswer object"""
     minimal_list = list()
