@@ -63,7 +63,6 @@ def chunking(
                             isinstance(
                                 node, (ast.FunctionDef, ast.AsyncFunctionDef)
                             )
-                            and lines[node.lineno] != "#"
                         ):
                             if isinstance(node.end_lineno, int):
                                 node.end_lineno -= 1
@@ -92,7 +91,7 @@ def chunking(
                     ]
                     if lines_left:
                         part = str()
-                        for li in lines:
+                        for li in lines_left:
                             if li != "#":
                                 part += li
                                 part += '\n'

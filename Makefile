@@ -12,9 +12,9 @@ UV          = uv
 UV_RUN      = $(UV) run python
 MAIN        = -m student
 MOULINETTE_BIN = ./moulinette/moulinette-ubuntu
-EXAM_RETRIEVAL = ./exams/scripts/exam_retrieval.sh
-EXAM_ANSWER = ./exams/scripts/exam_answer.sh
-EXAM_EDGE = ./exams/scripts/exam_edge_cases.sh
+EXAM_RETRIEVAL = ./exams_pkg/exams/scripts/exam_retrieval.sh
+EXAM_ANSWER = ./exams_pkg/exams/scripts/exam_answer.sh
+EXAM_EDGE = ./exams_pkg/exams/scripts/exam_edge_cases.sh
 
 # Default single-query parameters (override: make answer Q="..." K=5)
 Q   ?= How is tensor parallelism configured?
@@ -140,13 +140,13 @@ pipeline: index search-dataset moulinette
 exam-retrieval:
 	$(EXAM_RETRIEVAL) \
 		--student-path . \
-		--moulinette-path ./moulinette/moulinette-ubuntu \
+		--moulinette-path ./moulinette_pkg/moulinette-ubuntu \
 		--module-name student
 
 exam-answer:
 	$(EXAM_ANSWER) \
 		--student-path . \
-		--moulinette-path ./moulinette/moulinette-ubuntu \
+		--moulinette-path ./moulinette_pkg/moulinette-ubuntu \
 		--module-name student
 
 exam-edge:
