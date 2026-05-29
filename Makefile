@@ -110,16 +110,10 @@ answer-dataset: answer-docs answer-code
 
 # ── Local evaluation via student CLI (recall@1,3,5,10) ───────────────────────
 evaluate-docs:
-	$(UV_RUN) $(MAIN) evaluate \
-		--student_answer_path $(SEARCH_OUT)/dataset_docs_public.json \
-		--dataset_path $(ANSWERED_DOCS) \
-		--k $(K)
+	$(UV_RUN) $(MAIN) evaluate --mode docs
 
 evaluate-code:
-	$(UV_RUN) $(MAIN) evaluate \
-		--student_answer_path $(SEARCH_OUT)/dataset_code_public.json \
-		--dataset_path $(ANSWERED_CODE) \
-		--k $(K)
+	$(UV_RUN) $(MAIN) evaluate --mode code
 
 evaluate: evaluate-docs evaluate-code
 
